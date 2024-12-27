@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sales Charts</title>
+
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+    />
+
+    <style>
+      /* Navbar styles */
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #333;
+        color: white;
+        padding: 10px;
+      }
+
+      .navbar .home {
+        margin: 0;
+      }
+
+      .navbar a {
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      .navbar a:hover {
+        background-color: white;
+        color: #333;
+      }
+
+      .navbar .home:hover {
+        background-color: #333;
+        color: wheat;
+      }
+
+      /* Content styles */
+      .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px auto;
+        max-width: 1000px;
+        padding: 20px;
+        border-radius: 10px;
+      }
+
+      .content h1 {
+        font-size: 2em;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      .content p {
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      .content p strong {
+        font-weight: bold;
+        color: #333;
+      }
+
+      .stats-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 30px;
+        width: 100%;
+      }
+
+      .stat-box {
+        background: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        width: 48%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .chart-container {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        width: 100%;
+        margin-top: 30px;
+      }
+
+      .chart-box {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .chart-box img {
+        max-width: 100%;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar mb-4">
+      <h1>
+        <a class="home" href="/">SIMBA</a>
+      </h1>
+      <div>
+        <a href="{% url 'sale_list' %}">View Sales</a>
+        <a href="/">Home</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Sales Chart</h1>
+
+      <!-- Stats Section -->
+      <div class="stats-container">
+        <div class="stat-box">
+          <p><strong>Today Paid:</strong> ₹{{ daily_paid }}</p>
+          <p><strong>Today Unpaid:</strong> ₹{{ daily_unpaid }}</p>
+        </div>
+        <div class="stat-box">
+          <p><strong>Month Paid:</strong> ₹{{ monthly_paid }}</p>
+          <p><strong>Month Unpaid:</strong> ₹{{ monthly_unpaid }}</p>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="chart-container">
+        <div class="chart-box">
+          <h4>Daily Sales</h4>
+          <img
+            src="data:image/png;base64,{{ daily_chart_url }}"
+            alt="Daily Sales Chart"
+          />
+        </div>
+        <div class="chart-box">
+          <h4>Monthly Sales</h4>
+          <img
+            src="data:image/png;base64,{{ monthly_chart_url }}"
+            alt="Monthly Sales Chart"
+          />
+        </div>
+        <div class="chart-box">
+          <h4>Most Sold Items</h4>
+          <img
+            src="data:image/png;base64,{{ most_sold_chart_url }}"
+            alt="Most Sold Items Chart"
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

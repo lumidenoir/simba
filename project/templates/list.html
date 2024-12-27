@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Item List</title>
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+            crossorigin="anonymous"
+        />
+        <style>
+         /* Navbar styling */
+         .navbar {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             background-color: #333;
+             color: white;
+             padding: 10px;
+         }
+
+         .navbar .home {
+             margin: 0;
+         }
+
+         .navbar a {
+             color: white;
+             text-decoration: none;
+             padding: 10px;
+             border-radius: 5px;
+         }
+
+         .navbar a:hover {
+             background-color: white;
+             color: #333;
+         }
+
+         .navbar .home:hover {
+             background-color: #333;
+             color: wheat;
+         }
+
+         /* Main content styles */
+         .container {
+             display: flex;
+             flex-direction: column;
+             margin-top: 40px;
+             padding: 0 15px;
+         }
+
+         .form-container,
+         .items-container {
+             border-radius: 8px;
+             padding: 20px;
+             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+             background-color: #f9f9f9;
+             margin-bottom: 20px; /* Add some space between the form and items */
+         }
+
+         .form-container {
+             width: 100%;
+             margin: 10 auto;
+             padding: 20px;
+             border-radius: 8px;
+             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+             background-color: #f9f9f9;
+         }
+
+         .form-row .form-group {
+             margin-bottom: 15px;
+         }
+
+         .form-row .form-group label {
+             font-weight: bold;
+         }
+
+
+         .table-container table {
+             border-collapse: separate;
+             border-spacing: 0;
+             background-color: white;
+             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+             border-radius: 10px;
+             overflow: hidden;
+             margin: 20px auto;
+             width: 100%;
+         }
+
+         h1,
+         h3 {
+             text-align: center;
+             color: #333;
+         }
+
+         .form-group label {
+             font-weight: bold;
+             color: #555;
+         }
+
+         .form-control {
+             border-radius: 8px;
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+             padding: 10px;
+         }
+
+         .btn-primary {
+             background-color: #007bff;
+             border-color: #007bff;
+             padding: 10px 15px;
+             font-size: 14px;
+             border-radius: 5px;
+         }
+
+         .btn-primary:hover {
+             background-color: #0056b3;
+         }
+
+         .btn-danger {
+             background-color: #dc3545;
+             border-color: #dc3545;
+             padding: 10px 15px;
+             font-size: 14px;
+             border-radius: 5px;
+         }
+
+         .btn-danger:hover {
+             background-color: #c82333;
+         }
+
+         .alert-danger {
+             background-color: #f8d7da;
+             border-color: #f5c6cb;
+             color: #721c24;
+             padding: 10px;
+             border-radius: 5px;
+             margin-top: 15px;
+             font-size: 16px;
+         }
+
+         table {
+             margin-top: 20px;
+             width: 90%;
+             margin: auto;
+             border-radius: 10px;
+             overflow: hidden;
+         }
+
+         table th,
+         table td {
+             text-align: center;
+             padding: 12px;
+             font-size: 1.1em;
+         }
+
+         table th {
+             background-color: #333;
+             color: white;
+         }
+
+         table tr:nth-child(even) {
+             background-color: #f9f9f9;
+         }
+
+         table tr:hover {
+             background-color: #f1f1f1;
+         }
+
+         /* Responsiveness */
+         @media (max-width: 768px) {
+             .container {
+                 padding: 0 10px;
+             }
+             .form-container {
+                 padding: 15px;
+             }
+         }
+        </style>
+    </head>
+
+    <body>
+        <!-- Navbar -->
+        <div class="navbar mb-4">
+            <h1><a class="home" href="/">SIMBA</a></h1>
+            <div>
+                <a href="{% url 'reorder' %}">Restock Items</a>
+                <a href="{% url 'home' %}">Home</a>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="container">
+            <div class="form-container">
+                <form action="{% url 'list' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="itype">Item Name</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="itype"
+                                name="itype"
+                                placeholder="Enter Item name"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="quantity">Quantity</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="quantity"
+                                name="quantity"
+                                placeholder="Enter Quantity"
+                                step="any"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="gst">GST(%)</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="gst"
+                                name="gst"
+                                placeholder="Enter GST(%)"
+                                step="any"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="retailer_price">Retailer Price</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="retailer_price"
+                                name="retailer_price"
+                                placeholder="Enter Retailer Price"
+                                step="any"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="chef_price">Chef Price</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="chef_price"
+                                name="chef_price"
+                                placeholder="Enter Chef Price"
+                                step="any"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="bulk_price">Bulk Price</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="bulk_price"
+                                name="bulk_price"
+                                placeholder="Enter Bulk Price"
+                                step="any"
+                            />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Add Item
+                    </button>
+                </form>
+
+                {% if msg %}
+                <div class="alert alert-danger mt-3" role="alert">{{ msg }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Items List Section (bottom) -->
+            <div class="table-container">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>GST(%)</th>
+                            <th>Retailer Price</th>
+                            <th>Chef Price</th>
+                            <th>Bulk Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.i_type }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.gst }}%</td>
+                            <td>{{ item.retailer_price }}</td>
+                            <td>{{ item.chef_price }}</td>
+                            <td>{{ item.bulk_price }}</td>
+                            <td>
+                                <div style="display: flex; justify-content: space-evenly">
+                                    <form action="{% url 'edit' item.id %}" method="get">
+                                        {% csrf_token %}
+                                        <button class="btn btn-primary">Edit</button>
+                                    </form>
+                                    <form action="{% url 'delete' item.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <button class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <!-- Pagination controls -->
+                <div class="pagination-container">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if items.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ items.previous_page_number }}">
+                                    Previous
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in items.paginator.page_range %}
+                            <li class="page-item {% if items.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                            {% endfor %}
+
+                            {% if items.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ items.next_page_number }}">
+                                    Next
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
