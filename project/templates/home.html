@@ -1,0 +1,151 @@
+{% load static %}
+<!doctype html>
+<html>
+  <head>
+    <!-- TODO Ofline Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <title>SIMBA</title>
+    <link rel="stylesheet" href="{% static 'user/bs431.min.css' %}">
+
+    <style>
+     /* CSS for navigation bar */
+     .navbar {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       background-color: #333;
+       color: white;
+       padding: 10px;
+     }
+
+     .navbar .home {
+       margin: 0;
+     }
+
+     .navbar a {
+       color: white;
+       text-decoration: none;
+       padding: 10px;
+       border-radius: 5px;
+     }
+
+     .navbar a:hover {
+       background-color: white;
+       color: #333;
+     }
+
+     .navbar .home:hover {
+       background-color: #333;
+       color: wheat;
+     }
+     .button-container {
+       display: flex;
+       flex-wrap: wrap;
+       justify-content: center;
+       align-items: center;
+       margin: 20px 0;
+     }
+
+     .btn {
+       display: flex;
+       flex-direction: column;
+       justify-content: center;
+       align-items: center;
+       margin: 10px;
+       width: 45%;
+       height: 150px;
+       font-size: 24px;
+       font-weight: bold;
+       color: white;
+       background-color: #007bff;
+       border-radius: 10px;
+       text-align: center;
+       text-decoration: none;
+     }
+
+     .btn .material-icons {
+       font-size: 80px;
+       margin-bottom: 10px;
+     }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar mb-4">
+      <h1><a class="home" href="/">SIMBA</a></h1>
+      <div>
+        <a href="{% url 'do_logout' %}">Log Out</a>
+      </div>
+    </div>
+    <div class="container">
+      <div class="container">
+        <div class="button-container">
+          <a href="{% url 'list' %}" class="btn">
+            <span class="material-icons">view_list</span>
+            Item List
+          </a>
+          <a href="{% url 'sale' %}" class="btn">
+            <span class="material-icons">receipt_long</span>
+            Make Sale
+          </a>
+        </div>
+        <div class="button-container">
+          <a href="{% url 'sale_list' %}" class="btn">
+            <span class="material-icons">history</span>
+            View Sales
+          </a>
+          <a href="{% url 'reorder' %}" class="btn">
+            <span class="material-icons">production_quantity_limits</span>
+            Restock List
+          </a>
+        </div>
+        <div class="button-container">
+          <a href="{% url 'cater' %}" class="btn">
+            <span class="material-icons">restaurant</span>
+            Catering
+          </a>
+          <a href="{% url 'cater_list' %}" class="btn">
+            <span class="material-icons">history</span>
+            Catering sales
+          </a>
+        </div>
+        <!-- <div>
+             <a href="{% url 'view_charts' %}" class="btn">
+             <span class="material-icons">bar_chart</span>
+             View Charts (WIP)
+             </a>
+             </div> -->
+      </div>
+    </div>
+    <footer
+      class="mt-5 py-4"
+      style="
+             background-color: #333;
+             color: white;
+             text-align: center;
+             position: fixed;
+             bottom: 0;
+             width: 100%;
+             "
+    >
+      <div class="container">
+        <h5 style="margin: 0;">
+          Contact:
+          <a href="mailto:lumidenoir@google.com" style="color: #f0ad4e; text-decoration: none;">
+            lumidenoir@google.com
+          </a>
+        </h5>
+        <h5 style="margin: 0;">
+          GitHub:
+          <a href="https://github.com/lumidenoir" target="_blank" style="color: #f0ad4e; text-decoration: none;">
+            github.com/lumidenoir
+          </a>
+        </h5>
+        <h6 style="margin: 0;">2024 SIMBA</h6>
+      </div>
+    </footer>
+  </body>
+</html>

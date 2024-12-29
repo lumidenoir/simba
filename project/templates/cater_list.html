@@ -5,7 +5,7 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Sales overview</title>
+        <title>Catering overview</title>
         <link rel="stylesheet" href="{% static 'user/bs431.min.css' %}">
 
         <style>
@@ -40,7 +40,6 @@
              color: wheat;
          }
 
-         /* Filter Form Styles */
          /* Filter Form Styles */
          .filter-container {
              margin: 20px auto;
@@ -130,7 +129,7 @@
          }
 
          .table-container {
-             margin-top: 15px;
+             margin-top: 30px;
          }
 
          .table-container table {
@@ -173,10 +172,10 @@
 
          /* Payment Button */
          .btn-status {
-             padding: 8px 16px;
+             padding: 6px 16px;
              font-size: 1em;
              border: none;
-             border-radius: 5px;
+             border-radius: 0.25rem;
              cursor: pointer;
          }
 
@@ -204,7 +203,7 @@
         <div class="navbar">
             <h1><a class="home" href="/">SIMBA</a></h1>
             <div>
-                <a href="{% url 'sale' %}">Go to Sale</a>
+                <a href="{% url 'cater' %}">Go to Cater</a>
                 <a href="{% url 'home' %}">Home</a>
             </div>
         </div>
@@ -256,7 +255,6 @@
                             <option value="">All</option>
                             <option value="paid" {% if payment_status == "paid" %}selected{% endif %}>Paid</option>
                             <option value="unpaid" {% if payment_status == "unpaid" %}selected{% endif %}>Unpaid</option>
-                            <option value="return" {% if payment_status == "return" %}selected{% endif %}>Return</option>
                         </select>
                     </div>
                     <div class="form-group mx-2 mb-2">
@@ -271,7 +269,7 @@
                         />
                     </div>
                     <button type="submit" class="btn btn-primary mx-2 mb-2">Filter</button>
-                    <a href="{% url 'sale_list' %}" class="btn btn-danger mx-2 mb-2">Clear</a>
+                    <a href="{% url 'cater_list' %}" class="btn btn-danger mx-2 mb-2">Clear</a>
                 </form>
             </div>
         </div>
@@ -280,7 +278,7 @@
         <div class="overview-box">
             <p class="paid">Total Paid: ₹{{ total_paid }}</p>
             <p class="unpaid">Total Unpaid: ₹{{ total_unpaid }}</p>
-            <p class="return">Total Return: ₹{{ total_return }}</p>
+            <p class="return">Total Cost: ₹{{ total_cost }}</p>
         </div>
 
         <!-- Sales Table -->
@@ -301,7 +299,7 @@
                 <tbody>
                     {% for sale in grouped_sales %}
                         <tr>
-                            <td>{{ sale.sale_id }}</td>
+                            <td>{{ sale.cater_id }}</td>
                             <td>{{ sale.datetime }}</td>
                             <td>{{ sale.customer_name }}</td>
                             <td>{{ sale.customer_mobile }}</td>
@@ -309,7 +307,7 @@
                             <td>
                                 <form
                                     method="POST"
-                                    action="{% url 'toggle_payment_status' type='sale' sale_id=sale.sale_id %}"
+                                    action="{% url 'toggle_payment_status' type='cater' sale_id=sale.cater_id %}"
                                 >
                                     {% csrf_token %}
                                     <button
@@ -321,8 +319,6 @@
                                             Unpaid
                                         {% elif sale.payment_status == 'paid' %}
                                             Paid
-                                        {% elif sale.payment_status == 'return' %}
-                                            Return
                                         {% endif %}
 
                                     </button>
@@ -331,23 +327,19 @@
                             <td>
                                 {% if sale.pdf_exists %}
                                     <a
-                                        href="{% url 'serve_pdf' sale_id=sale.sale_id %}"
+                                        href="{% url 'serve_pdf' sale.cater_id %}"
                                         target="_blank"
                                         class="btn btn-info"
-                                    >View Bill</a
-                                              >
+                                    >View Bill</a>
                                 {% else %}
                                     <span>No Bill</span>
                                 {% endif %}
                             </td>
                             <td>
-                                {% if sale.is_within_7_days %}
-                                    <a
-                                        href="{% url 'return_items' sale.sale_id %}"
-                                        class="btn btn-warning"
-                                    >Return Items</a
-                                                 >
-                                {% endif %}
+                                <a
+                                    href="{% url 'view_cater_id' sale.cater_id %}"
+                                    class="btn btn-info"
+                                >View Details</a>
                             </td>
                         </tr>
                     {% endfor %}

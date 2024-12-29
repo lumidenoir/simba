@@ -1,28 +1,28 @@
 import base64
-from datetime import datetime, timedelta
 import io
 import os
 import random
-import urllib
+from datetime import datetime, timedelta
 
-from django.core.paginator import Paginator
+import matplotlib.pyplot as plt
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.db.models import Case, F, Func, Max, Sum, When
+from django.core.paginator import Paginator
+from django.db.models import F, Func, Max, Sum
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.dateparse import parse_date
-import matplotlib.pyplot as plt
 from weasyprint import HTML
 
 from .forms import *
 from .models import *
 
+# TODO review and refator similar functions into one
+
 def home(request):
     if request.user.is_authenticated:
-        return render(request, 'home_wilogin.html')
+        return render(request, 'home.html')
     else:
         return redirect('/login')
 
@@ -47,7 +47,7 @@ def list(request):
 
             item = Item(
                 i_type=itype,
-                quantity=quantity,
+                quantity=round(quantity,4),
                 gst=gst,
                 retailer_price=retailer_price,
                 chef_price=chef_price,
@@ -87,15 +87,11 @@ def delete_sale_item(request, id):
         sale.delete()
     return redirect('/sale')
 
-def view_delete(request):
-    items = Item.objects.all()
-    return render(request, 'delete.html', {'items':items})
-
 def edit(request, id):
     if(request.method=="POST"):
         item = Item.objects.get(id=id)
         item.i_type = request.POST.get('itype')
-        item.quantity = float(request.POST.get('quantity'))
+        item.quantity = round(float(request.POST.get('quantity')),4)
         item.gst = float(request.POST.get('gst'))
         item.retailer_price = round(float(request.POST.get('retailer_price')), 2)
         item.chef_price = round(float(request.POST.get('chef_price')), 2)
@@ -111,30 +107,32 @@ def generate_sale_id():
     random_number = f"{random.randint(100, 999):03d}"
     return f"{date_str}{random_number}"
 
-def add_customer_info(request):
-    if 'sale_id' not in request.session:
-        request.session['sale_id'] = generate_sale_id()
+def add_customer_info(request, type):
+    session_key = f"{type}_id"
+    if session_key not in request.session:
+        request.session[session_key] = generate_sale_id()
 
     if request.method == "POST":
-        customer_name = request.POST['customer_name']
-        customer_address = request.POST['customer_address']
-        customer_mobile = request.POST['customer_mobile']
-        buyer_type = request.POST['buyer_type']
-
         request.session.update({
-            'customer_name': customer_name,
-            'customer_address': customer_address,
-            'customer_mobile': customer_mobile,
-            'buyer_type': buyer_type
+            'customer_name': request.POST['customer_name'],
+            'customer_address': request.POST['customer_address'],
+            'customer_mobile': request.POST['customer_mobile'],
         })
+        if type == "sale":
+            request.session['buyer_type'] = request.POST['buyer_type']
+            return redirect('sale')
+        elif type == "cater":
+            request.session['gst_cater'] = request.POST['gst_cater']
+            return redirect('cater')
 
-        return redirect('sale')
-
-    return render(request, 'add_customer_info.html')
+    return render(request, 'add_customer_info.html', {'type': type})
 
 def sale(request):
-    if 'sale_id' not in request.session:
-        return redirect('add_customer_info')
+    if 'sale_id' not in request.session or not all(
+        key in request.session for key in ['customer_name', 'customer_address', 'customer_mobile', 'buyer_type']
+    ):
+        return redirect('add_customer_info', type='sale')
+
 
     sale_id = request.session['sale_id']
     customer_name = request.session.get('customer_name', None)
@@ -150,7 +148,7 @@ def sale(request):
         quantity = float(request.POST['quantity'])
         item_discount = float(request.POST['discount'] or 0)
         item = Item.objects.filter(i_type=itype).first()
-        items = Item.objects.all()
+        items = Item.objects.exclude(quantity=0)
         sale_items = Sale.objects.filter(sale_id=sale_id)
 
         if sale_items.filter(i_type=itype).exists():
@@ -219,7 +217,7 @@ def sale(request):
                 discount = sale_item.discount
                 total_with_gst = subtotal + gst_subtotal
                 discount_amount = (total_with_gst * discount) / 100
-                sale_price = round(total_with_gst - discount_amount, 2)
+                sale_price = sale_item.sale_price
 
                 sale_data.append({
                     'id': sale_item.id,
@@ -284,13 +282,11 @@ def sale_list(request):
         sales_query = sales_query.filter(payment_status=payment_status_filter)
 
     grouped_sales = (
-        sales_query.values('sale_id')
+        sales_query.values('sale_id', 'customer_name', 'customer_mobile')
         .annotate(
             grand_total=Round(Sum('sale_price')),
             datetime=Max('created_at'),
             payment_status=Max('payment_status'),
-            customer_name=F('customer_name'),
-            customer_mobile=F('customer_mobile'),
         )
         .order_by('-datetime')
     )
@@ -375,7 +371,7 @@ def checkout(request):
 
             sale_data.append({
                 'item_type': sale_item.i_type,
-                'quantity': quantity,
+                'quantity': round(quantity,4),
                 'price': price,
                 'subtotal': round(subtotal, 2),
                 'gst': gst,
@@ -404,9 +400,12 @@ def checkout(request):
         'customer_address': customer_address
     })
 
-def toggle_payment_status(request, sale_id):
+def toggle_payment_status(request, type, sale_id):
     if request.method == 'POST':
-        sales = Sale.objects.filter(sale_id=sale_id)
+        if type=='sale':
+            sales = Sale.objects.filter(sale_id=sale_id)
+        elif type=='cater':
+            sales = Cater.objects.filter(cater_id=sale_id)
         if sales.exists():
             current_status = sales.first().payment_status
             if current_status=='return':
@@ -414,7 +413,7 @@ def toggle_payment_status(request, sale_id):
             else:
                 new_status = 'paid' if current_status == 'unpaid' else 'unpaid'
             sales.update(payment_status=new_status)
-    return redirect('sale_list')
+    return redirect(f"{type}_list")
 
 def generate_bill(request, sale_id):
     sale_items = Sale.objects.filter(sale_id=sale_id)
@@ -734,32 +733,28 @@ def checkout_return(request, sale_id):
     })
 
 def generate_return_bill(request, sale_id):
-    # Fetch sale items
     return_sale_id=request.session.get('return_sale_id')
     sale_items = Sale.objects.filter(sale_id=return_sale_id)
     if not sale_items.exists():
         raise Http404("No sales found for the given Sale ID.")
 
-    # Aggregate return data
     sale_data = []
     total_return_price = Sale.objects.filter(sale_id=return_sale_id).aggregate(total=Sum('sale_price'))['total'] or 0
     total_return_price = round(total_return_price, 2)
 
     for sale_item in sale_items:
-        quantity = abs(sale_item.quantity)  # Ensure positive quantity
+        quantity = abs(sale_item.quantity)
         sale_data.append({
             'item_type': sale_item.i_type,
             'quantity': quantity,
             'sale_price': sale_item.sale_price
         })
 
-    # Extract customer details
     first_item = sale_items.first()
     customer_name = first_item.customer_name
     customer_address = first_item.customer_addrs
     customer_mobile = first_item.customer_mobile
 
-    # Render HTML content for the PDF
     html_content = render_to_string('return_bill.html', {
         'sale_data': sale_data,
         'sale_id': sale_id,
@@ -770,15 +765,12 @@ def generate_return_bill(request, sale_id):
         'total_return_price': round(total_return_price,0)
     })
 
-    # Generate PDF
     pdf_file_path = f'bill/{return_sale_id}.pdf'
     os.makedirs('bill', exist_ok=True)
     HTML(string=html_content).write_pdf(pdf_file_path)
 
-    # Clear return-related session data
     request.session.pop('return_sale_id', None)
 
-    # Serve the PDF file
     try:
         with open(pdf_file_path, 'rb') as pdf_file:
             response = HttpResponse(pdf_file.read(), content_type='application/pdf')
@@ -786,3 +778,267 @@ def generate_return_bill(request, sale_id):
             return response
     except FileNotFoundError:
         raise Http404("Generated PDF file not found.")
+
+def cater(request):
+    if 'cater_id' not in request.session or not all(
+        key in request.session for key in ['customer_name', 'customer_address', 'customer_mobile', 'gst_cater']
+    ):
+        return redirect('add_customer_info', type='cater')
+
+    cater_id = request.session['cater_id']
+    customer_name = request.session.get('customer_name', None)
+    customer_mobile = request.session.get('customer_mobile', None)
+    customer_address = request.session.get('customer_address', None)
+    gst = float(request.session.get('gst_cater')) or 0
+
+    if request.method == 'POST':
+        in_name = request.POST.get('in_name')
+        in_quantity = request.POST.get('in_quantity') or 1
+        in_subtotal = request.POST.get('in_subtotal')
+
+        if in_name and in_subtotal:
+            in_quantity = round(float(in_quantity),4)
+            in_subtotal = round(float(in_subtotal),2)
+            Cater.objects.create(
+                cater_id=cater_id,
+                i_type=in_name,
+                quantity=in_quantity,
+                price=round(in_subtotal / in_quantity,2),
+                subtotal=in_subtotal,
+                sale_price=in_subtotal,
+                type_status='in',
+                created_at=timezone.now(),
+                customer_name=customer_name,
+                customer_addrs=customer_address,
+                customer_mobile=customer_mobile
+            )
+
+        out_name = request.POST.get('out_name')
+        out_quantity = request.POST.get('out_quantity') or 1
+        out_subtotal = request.POST.get('out_subtotal')
+
+        if out_name and out_subtotal:
+            out_quantity = round(float(out_quantity),4)
+            out_subtotal = round(float(out_subtotal),2)
+            Cater.objects.create(
+                cater_id=cater_id,
+                i_type=out_name,
+                quantity=round(out_quantity, 4),
+                price=round(out_subtotal / out_quantity, 2),
+                sale_price=round(out_subtotal + out_subtotal * gst / 100, 2),
+                type_status='out',
+                gst=gst,
+                gst_subtotal=round(out_subtotal*gst/100,2),
+                subtotal=round(out_subtotal,2),
+                created_at=timezone.now(),
+                customer_name=customer_name,
+                customer_addrs=customer_address,
+                customer_mobile=customer_mobile
+            )
+
+        return redirect('cater')
+
+    cater_in_items = Cater.objects.filter(cater_id=cater_id, type_status='in')
+    cater_out_items = Cater.objects.filter(cater_id=cater_id, type_status='out')
+    cater_in_total = sum(item.sale_price for item in cater_in_items)
+    cater_out_total = sum(item.sale_price for item in cater_out_items)
+
+    return render(request, 'cater.html', {
+        'cater_in_items': cater_in_items,
+        'cater_out_items': cater_out_items,
+        'customer_name': customer_name,
+        'customer_mobile': customer_mobile,
+        'customer_address': customer_address,
+        'gst_cater': gst,
+        'in_total': cater_in_total,
+        'out_total': cater_out_total,
+    })
+
+def clear_cater(request):
+    cater_id = request.session.get('cater_id')
+    if cater_id:
+        cater_items = Cater.objects.filter(cater_id=cater_id)
+        cater_items.delete()
+        del request.session['cater_id']
+        del request.session['customer_name']
+        del request.session['customer_address']
+        del request.session['customer_mobile']
+    return redirect('/cater')
+
+def delete_cater_item(request, id):
+    cater = Cater.objects.filter(id=id).first()
+    if cater:
+        cater.delete()
+    return redirect('/cater')
+
+def checkout_cater(request):
+    customer_name = request.session.get('customer_name', None)
+    customer_mobile = request.session.get('customer_mobile', None)
+    customer_address = request.session.get('customer_address', None)
+
+    if 'cater_id' not in request.session:
+        return redirect('cater')
+
+    cater_id = request.session['cater_id']
+    cater_items = Cater.objects.filter(cater_id=cater_id, type_status='out')
+
+    cater_data = []
+
+    for item in cater_items:
+            gst = item.gst
+            price = item.price
+            quantity = item.quantity
+            subtotal = item.subtotal
+            gst_subtotal = item.gst_subtotal
+            sale_price = item.sale_price
+
+            cater_data.append({
+                'item_type': item.i_type,
+                'quantity': round(quantity,4),
+                'price': price,
+                'subtotal': round(subtotal, 2),
+                'gst': gst,
+                'gst_subtotal': round(gst_subtotal, 2),
+                'sale_price': sale_price
+            })
+
+    grand_total = cater_items.aggregate(total=Sum('sale_price'))['total'] or 0
+    total_price = cater_items.aggregate(total=Sum('subtotal'))['total'] or 0
+    gst_total = cater_items.aggregate(total=Sum('gst_subtotal'))['total'] or 0
+
+    return render(request, 'cater_bill.html', {
+        'cater_data': cater_data,
+        'total_price': total_price,
+        'gst_total': gst_total,
+        'grand_total': grand_total,
+        'cater_id': cater_id,
+        'customer_name': customer_name,
+        'customer_mobile': customer_mobile,
+        'customer_address': customer_address
+    })
+
+def generate_cater_bill(request, cater_id):
+    customer_name = request.session.get('customer_name', None)
+    customer_mobile = request.session.get('customer_mobile', None)
+    customer_address = request.session.get('customer_address', None)
+
+    if 'cater_id' not in request.session:
+        return redirect('cater')
+
+    cater_id = request.session['cater_id']
+    cater_items = Cater.objects.filter(cater_id=cater_id, type_status='out')
+
+    cater_data = []
+
+    for item in cater_items:
+            gst = item.gst
+            price = item.price
+            quantity = item.quantity
+            subtotal = item.subtotal
+            gst_subtotal = item.gst_subtotal
+            sale_price = item.sale_price
+
+            cater_data.append({
+                'item_type': item.i_type,
+                'quantity': round(quantity,4),
+                'price': price,
+                'subtotal': round(subtotal, 2),
+                'gst': gst,
+                'gst_subtotal': round(gst_subtotal, 2),
+                'sale_price': sale_price
+            })
+
+    grand_total = cater_items.aggregate(total=Sum('sale_price'))['total'] or 0
+    total_price = cater_items.aggregate(total=Sum('subtotal'))['total'] or 0
+    gst_total = cater_items.aggregate(total=Sum('gst_subtotal'))['total'] or 0
+
+    html_content = render_to_string('cater_bill.html', {
+        'cater_data': cater_data,
+        'total_price': total_price,
+        'gst_total': gst_total,
+        'grand_total': grand_total,
+        'cater_id': cater_id,
+        'customer_name': customer_name,
+        'customer_mobile': customer_mobile,
+        'customer_address': customer_address
+    })
+
+    pdf_file_path = f'bill/{cater_id}.pdf'
+    os.makedirs('bill', exist_ok=True)
+    HTML(string=html_content).write_pdf(pdf_file_path)
+
+    for key in ['cater_id', 'customer_name', 'customer_address', 'customer_mobile', 'gst_cater']:
+        request.session.pop(key, None)
+
+    with open(pdf_file_path, 'rb') as pdf_file:
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{cater_id}.pdf"'
+        return response
+
+def cater_list(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    customer_name_filter = request.GET.get('customer_name')
+    bill_no_filter = request.GET.get('bill_no')
+    payment_status_filter = request.GET.get('payment_status')
+    page_number = request.GET.get('page', 1)
+
+    cater_query = Cater.objects.all()
+
+    if start_date and end_date:
+        cater_query = cater_query.filter(
+            created_at__date__gte=parse_date(start_date),
+            created_at__date__lte=parse_date(end_date)
+        )
+
+    if bill_no_filter and bill_no_filter.lower() != "none":
+        cater_query = cater_query.filter(cater_id__icontains=bill_no_filter)
+
+    if customer_name_filter and customer_name_filter.lower() != "none":
+        cater_query = cater_query.filter(customer_name__icontains=customer_name_filter)
+
+    if payment_status_filter:
+        cater_query = cater_query.filter(payment_status=payment_status_filter)
+
+    grouped_sales = (
+        cater_query.filter(type_status="out").values('cater_id', 'customer_name', 'customer_mobile')
+        .annotate(
+            grand_total=Round(Sum('sale_price')),
+            datetime=Max('created_at'),
+            payment_status=Max('payment_status'),
+        )
+        .order_by('-datetime')
+    )
+
+    paginator = Paginator(grouped_sales, 10)
+    caters_page = paginator.get_page(page_number)
+
+    total_paid = cater_query.filter(payment_status='paid', type_status='out').aggregate(total=Round(Sum('sale_price')))['total'] or 0
+    total_unpaid = cater_query.filter(payment_status='unpaid', type_status='out').aggregate(total=Round(Sum('sale_price')))['total'] or 0
+    total_cost = cater_query.filter(type_status='in').aggregate(total=Round(Sum('sale_price')))['total'] or 0
+
+    caters_data = []
+    for cater in caters_page:
+        cater['pdf_exists'] = os.path.exists(f'bill/{cater["cater_id"]}.pdf')
+        caters_data.append(cater)
+
+    return render(request, 'cater_list.html', {
+        'grouped_sales': caters_data,
+        'start_date': start_date,
+        'end_date': end_date,
+        'bill_no': bill_no_filter,
+        'payment_status': payment_status_filter,
+        'customer_name': customer_name_filter,
+        'total_paid': total_paid,
+        'total_unpaid': total_unpaid,
+        'total_cost': total_cost,
+        'page_obj': caters_page,
+    })
+
+def view_cater_id(request, cater_id):
+    in_items = Cater.objects.filter(cater_id=cater_id, type_status='in')
+    out_items = Cater.objects.filter(cater_id=cater_id, type_status='out')
+    in_total = sum(item.sale_price for item in in_items)
+    out_total = sum(item.sale_price for item in out_items)
+
+    return render(request, 'cater_id.html', {'cater_in_items': in_items, 'cater_out_items': out_items, 'in_total':in_total, 'out_total':out_total})

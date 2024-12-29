@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cater Bill #{{ cater_id }}</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        padding: 20px;
+      }
+      .bill-container {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        border: 1px solid #000;
+        padding: 20px;
+        background-color: #fff;
+      }
+      .bill-header,
+      .bill-footer {
+        text-align: center;
+        border-bottom: 1px solid #000;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+      .bill-header h2 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .bill-header p {
+        margin: 5px 0;
+      }
+      .customer-details {
+        margin-bottom: 20px;
+        border-bottom: 1px solid #000;
+        padding-bottom: 10px;
+      }
+      .customer-details h3 {
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+      .bill-details {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      .bill-details th,
+      .bill-details td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #000;
+      }
+      .bill-summary {
+        margin-top: 20px;
+        text-align: right;
+        font-size: 16px;
+        border-top: 1px solid #000;
+        padding-top: 10px;
+      }
+      .footer {
+        font-size: 12px;
+        margin-top: 20px;
+      }
+      .print-btn {
+        margin-top: 20px;
+        display: block;
+        width: 100%;
+        text-align: center;
+      }
+      .print-btn button {
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      .print-btn button:hover {
+        background-color: #45a049;
+      }
+      @media print {
+        .print-btn {
+          display: none;
+        }
+        .bill-container {
+          border: none;
+          padding: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bill-container">
+      <!-- Header Section -->
+      <div class="bill-header">
+        <h2>XYZ Store</h2>
+        <p>123, ABC Road, City, State</p>
+        <p>GSTIN: 1234567890ABC</p>
+        <p>Phone: 9876543210</p>
+        <p><strong>Cater Bill No:</strong> #{{ cater_id }}</p>
+      </div>
+
+      <!-- Customer Details -->
+      <div class="customer-details">
+        <h3>Customer Details</h3>
+        <p><strong>Name:</strong> {{ customer_name }}</p>
+        <p><strong>Mobile:</strong> {{ customer_mobile }}</p>
+        <p><strong>Address:</strong> {{ customer_address }}</p>
+      </div>
+
+      <!-- Bill Details Table -->
+      <table class="bill-details">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Amount</th>
+            <th>GST</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sale in cater_data %}
+          <tr>
+            <td>{{ sale.item_type }}</td>
+            <td>{{ sale.quantity }}</td>
+            <td>{{ sale.price }}</td>
+            <td>{{ sale.subtotal }}</td>
+            <td>{{ sale.gst_subtotal }} ({{ sale.gst }}%)</td>
+            <td>{{ sale.sale_price }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- Bill Summary -->
+      <div class="bill-summary">
+        <p><strong>Total:</strong> ₹{{ total_price }}</p>
+        <p><strong>GST:</strong> ₹{{ gst_total }}</p>
+        <p><strong>Grand Total:</strong> ₹{{ grand_total }}</p>
+      </div>
+
+      <!-- Footer Section -->
+      <div class="bill-footer footer">
+        <p>Thank you for shopping with us!</p>
+      </div>
+
+      <!-- Print Button -->
+      <div class="print-btn">
+        <button id="save-print-btn">Save & Print Bill</button>
+      </div>
+      <script>
+        document
+          .getElementById("save-print-btn")
+          .addEventListener("click", function () {
+              const url = "{% url 'generate_cater_bill' cater_id %}";
+              window.open(url, "_blank");
+          });
+      </script>
+      <div class="print-btn">
+        <button onclick="window.location.href='{% url 'cater' %}'">
+          Go Back to Cater
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

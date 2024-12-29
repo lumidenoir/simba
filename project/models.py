@@ -31,3 +31,22 @@ class Sale(models.Model):
 
     def __str__(self):
         return f"{self.sale_id} - {self.i_type} - {self.quantity}"
+
+class Cater(models.Model):
+    cater_id = models.CharField(max_length=20, null=True, blank=True) # FIXME to sale_id
+    i_type = models.CharField(max_length=250, null=True, blank=True)
+    type_status = models.CharField(max_length=5, choices=[('in', 'in'), ('out', 'out')], default='in')
+    quantity = models.FloatField(null=True, blank=True)
+    price = models.FloatField(null=True, blank=True)
+    customer_name = models.CharField(max_length=40, null=True, blank=True)
+    customer_addrs = models.CharField(max_length=250, null=True, blank=True)
+    customer_mobile = models.IntegerField(max_length=10, null=True, blank=True)
+    payment_status = models.CharField(max_length=10, choices=[('paid', 'paid'), ('unpaid', 'unpaid')], default='unpaid')
+    sale_price = models.FloatField(null=True, blank=True)
+    gst = models.FloatField(null=True, blank=True)
+    gst_subtotal = models.FloatField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    subtotal = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.cater_id} - {self.i_type} - {self.quantity}"
