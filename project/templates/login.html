@@ -1,104 +1,102 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spencer</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
-    />
+    <title>SIMBA</title>
+    <link rel="stylesheet" href="{% static 'user/bs431.min.css' %}">
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(to right, #6a11cb, #2575fc);
-        color: white;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 0;
-      }
+     body {
+       font-family: Arial, sans-serif;
+       background: linear-gradient(to right, #6a11cb, #2575fc);
+       color: white;
+       height: 100vh;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       margin: 0;
+     }
 
-      .navbar {
-        background-color: #333;
-        padding: 20px;
-        padding-left: 100px;
-        padding-right: 40px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-      }
+     .navbar {
+       background-color: #333;
+       padding: 20px;
+       padding-left: 100px;
+       padding-right: 40px;
+       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+     }
 
-      .navbar a {
-        color: white;
-        text-decoration: none;
-        font-size: 2rem;
-      }
+     .navbar a {
+       color: white;
+       text-decoration: none;
+       font-size: 2rem;
+     }
 
-      .container {
-        background: white;
-        color: black;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        width: 100%;
-        max-width: 400px;
-      }
+     .container {
+       background: white;
+       color: black;
+       padding: 30px;
+       border-radius: 10px;
+       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+       width: 100%;
+       max-width: 400px;
+     }
 
-      h2 {
-        text-align: center;
-        margin-bottom: 20px;
-      }
+     h2 {
+       text-align: center;
+       margin-bottom: 20px;
+     }
 
-      .input-box {
-        margin-bottom: 15px;
-        position: relative;
-      }
+     .input-box {
+       margin-bottom: 15px;
+       position: relative;
+     }
 
-      .input-box input {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 1rem;
-      }
+     .input-box input {
+       width: 100%;
+       padding: 10px;
+       border: 1px solid #ddd;
+       border-radius: 5px;
+       font-size: 1rem;
+     }
 
-      .input-box label {
-        margin-bottom: 5px;
-        display: block;
-        font-weight: bold;
-      }
+     .input-box label {
+       margin-bottom: 5px;
+       display: block;
+       font-weight: bold;
+     }
 
-      .input-box input:focus {
-        border-color: #2575fc;
-        outline: none;
-        box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
-      }
+     .input-box input:focus {
+       border-color: #2575fc;
+       outline: none;
+       box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+     }
 
-      .btn {
-        background-color: #2575fc;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        font-size: 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-        width: 100%;
-      }
+     .btn {
+       background-color: #2575fc;
+       color: white;
+       border: none;
+       padding: 10px 15px;
+       font-size: 1rem;
+       border-radius: 5px;
+       cursor: pointer;
+       width: 100%;
+     }
 
-      .btn:hover {
-        background-color: #1d5dc2;
-      }
+     .btn:hover {
+       background-color: #1d5dc2;
+     }
 
-      .navbar .home:hover {
-        background-color: #444;
-        color: wheat;
-      }
+     .navbar .home:hover {
+       background-color: #444;
+       color: wheat;
+     }
     </style>
   </head>
 
   <body>
     <div class="navbar">
-      <h1><a class="home" href="/">SIMBA</a></h1>
+      <h1><a class="home" href="/admin">SIMBA</a></h1>
     </div>
     <div class="container">
       <form action="{% url 'login' %}" method="POST">

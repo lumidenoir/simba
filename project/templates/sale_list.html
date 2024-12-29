@@ -1,388 +1,387 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sales overview</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
-    />
-    <style>
-     /* Navbar Styles */
-     .navbar {
-       display: flex;
-       justify-content: space-between;
-       align-items: center;
-       background-color: #333;
-       color: white;
-       padding: 10px;
-     }
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sales overview</title>
+        <link rel="stylesheet" href="{% static 'user/bs431.min.css' %}">
 
-     .navbar .home {
-       margin: 0;
-     }
+        <style>
+         /* Navbar Styles */
+         .navbar {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             background-color: #333;
+             color: white;
+             padding: 10px;
+         }
 
-     .navbar a {
-       color: white;
-       text-decoration: none;
-       padding: 10px;
-       border-radius: 5px;
-     }
+         .navbar .home {
+             margin: 0;
+         }
 
-     .navbar a:hover {
-       background-color: white;
-       color: #333;
-     }
+         .navbar a {
+             color: white;
+             text-decoration: none;
+             padding: 10px;
+             border-radius: 5px;
+         }
 
-     .navbar .home:hover {
-       background-color: #333;
-       color: wheat;
-     }
+         .navbar a:hover {
+             background-color: white;
+             color: #333;
+         }
 
-     /* Filter Form Styles */
-     /* Filter Form Styles */
-     .filter-container {
-       margin: 20px auto;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-       gap: 20px;
-       flex-wrap: nowrap;
-     }
+         .navbar .home:hover {
+             background-color: #333;
+             color: wheat;
+         }
 
-     .filter-container .form-group {
-       display: flex;
-       align-items: center;
-       gap: 10px;
-       padding-right: 10px;
-       padding-left: 10px;
-     }
+         /* Filter Form Styles */
+         /* Filter Form Styles */
+         .filter-container {
+             margin: 20px auto;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             gap: 20px;
+             flex-wrap: nowrap;
+         }
 
-     .filter-container label {
-       white-space: nowrap;
-       font-weight: bold;
-     }
+         .filter-container .form-group {
+             display: flex;
+             align-items: center;
+             gap: 10px;
+             padding-right: 10px;
+             padding-left: 10px;
+         }
 
-     .filter-container input,
-     .filter-container select {
-       padding: 8px;
-       font-size: 1em;
-       width: 180px;
-     }
+         .filter-container label {
+             white-space: nowrap;
+             font-weight: bold;
+         }
 
-     .filter-container button,
-     .filter-container a {
-       padding: 10px 20px;
-       font-size: 1em;
-       background-color: #007bff;
-       color: white;
-       border: none;
-       border-radius: 5px;
-       text-decoration: none;
-       display: inline-block;
-     }
+         .filter-container input,
+         .filter-container select {
+             padding: 8px;
+             font-size: 1em;
+             width: 180px;
+         }
 
-     .filter-container a.btn-secondary {
-       background-color: #6c757d;
-     }
+         .filter-container button,
+         .filter-container a {
+             padding: 10px 20px;
+             font-size: 1em;
+             background-color: #007bff;
+             color: white;
+             border: none;
+             border-radius: 5px;
+             text-decoration: none;
+             display: inline-block;
+         }
 
-     .filter-container button:hover {
-       background-color: #0056b3;
-     }
+         .filter-container a.btn-secondary {
+             background-color: #6c757d;
+         }
 
-     .filter-container a.btn-secondary:hover {
-       background-color: #5a6268;
-     }
+         .filter-container button:hover {
+             background-color: #0056b3;
+         }
 
-     .filter-container button,
-     .filter-container a {
-       margin-left: 20px;
-     }
+         .filter-container a.btn-secondary:hover {
+             background-color: #5a6268;
+         }
 
-     /* Overview Box */
-     .overview-box {
-       background-color: #f8f9fa;
-       padding: 15px;
-       border-radius: 8px;
-       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-       display: flex;
-       justify-content: space-between;
-       width: 40%;
-       margin: 20px auto;
-     }
+         .filter-container button,
+         .filter-container a {
+             margin-left: 20px;
+         }
 
-     .overview-box p {
-       margin: 0;
-       font-size: 1.2em;
-       font-weight: bold;
-     }
+         /* Overview Box */
+         .overview-box {
+             background-color: #f8f9fa;
+             padding: 15px;
+             border-radius: 8px;
+             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+             display: flex;
+             justify-content: space-between;
+             width: 40%;
+             margin: 20px auto;
+         }
 
-     .overview-box .paid {
-       color: #28a745;
-     }
+         .overview-box p {
+             margin: 0;
+             font-size: 1.2em;
+             font-weight: bold;
+         }
 
-     .overview-box .unpaid {
-       color: #dc3545;
-     }
-     .overview-box .return {
-       color: grey;
-     }
+         .overview-box .paid {
+             color: #28a745;
+         }
 
-     .table-container {
-       margin-top: 30px;
-     }
+         .overview-box .unpaid {
+             color: #dc3545;
+         }
+         .overview-box .return {
+             color: grey;
+         }
 
-     .table-container table {
-       border-collapse: separate;
-       border-spacing: 0;
-       background-color: white;
-       box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-       border-radius: 10px;
-       overflow: hidden;
-       margin: 20px auto;
-       width: 90%;
-     }
-     table {
-       margin-top: 20px;
-       width: 90%;
-       margin: auto;
-       border-radius: 10px;
-       overflow: hidden;
-     }
+         .table-container {
+             margin-top: 30px;
+         }
 
-     table th,
-     table td {
-       text-align: center;
-       padding: 12px;
-       font-size: 1.1em;
-     }
+         .table-container table {
+             border-collapse: separate;
+             border-spacing: 0;
+             background-color: white;
+             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+             border-radius: 10px;
+             overflow: hidden;
+             margin: 20px auto;
+             width: 90%;
+         }
+         table {
+             margin-top: 20px;
+             width: 90%;
+             margin: auto;
+             border-radius: 10px;
+             overflow: hidden;
+         }
 
-     table th {
-       background-color: #333;
-       color: white;
-     }
+         table th,
+         table td {
+             text-align: center;
+             padding: 12px;
+             font-size: 1.1em;
+         }
 
-     table tr:nth-child(even) {
-       background-color: #f9f9f9;
-     }
+         table th {
+             background-color: #333;
+             color: white;
+         }
 
-     table tr:hover {
-       background-color: #f1f1f1;
-     }
+         table tr:nth-child(even) {
+             background-color: #f9f9f9;
+         }
 
-     /* Payment Button */
-     .btn-status {
-       padding: 8px 16px;
-       font-size: 1em;
-       border: none;
-       border-radius: 5px;
-       cursor: pointer;
-     }
+         table tr:hover {
+             background-color: #f1f1f1;
+         }
 
-     .btn-status.unpaid {
-       background-color: #f44336;
-       color: white;
-     }
+         /* Payment Button */
+         .btn-status {
+             padding: 8px 16px;
+             font-size: 1em;
+             border: none;
+             border-radius: 5px;
+             cursor: pointer;
+         }
 
-     .btn-status.paid {
-       background-color: #4caf50;
-       color: white;
-     }
-     .btn-status.return {
-       background-color: grey;
-       color: white;
-     }
+         .btn-status.unpaid {
+             background-color: #f44336;
+             color: white;
+         }
 
-     .btn-status:hover {
-       opacity: 0.8;
-     }
-    </style>
-  </head>
-  <body>
-    <!-- Navbar -->
-    <div class="navbar">
-      <h1><a class="home" href="/">SIMBA</a></h1>
-      <div>
-        <a href="{% url 'sale' %}">Go to Sale</a>
-        <a href="{% url 'home' %}">Home</a>
-      </div>
-    </div>
+         .btn-status.paid {
+             background-color: #4caf50;
+             color: white;
+         }
+         .btn-status.return {
+             background-color: grey;
+             color: white;
+         }
 
-    <!-- Filter Section -->
-    <div class="filter-container">
-      <form method="get" class="d-flex">
-        <div class="form-group">
-          <label for="start-date">Start Date:</label>
-          <input
-            type="date"
-            id="start-date"
-            name="start_date"
-            class="form-control"
-            value="{{ start_date }}"
-          />
+         .btn-status:hover {
+             opacity: 0.8;
+         }
+        </style>
+    </head>
+    <body>
+        <!-- Navbar -->
+        <div class="navbar">
+            <h1><a class="home" href="/">SIMBA</a></h1>
+            <div>
+                <a href="{% url 'sale' %}">Go to Sale</a>
+                <a href="{% url 'home' %}">Home</a>
+            </div>
         </div>
-        <div class="form-group">
-          <label for="end-date">End Date:</label>
-          <input
-            type="date"
-            id="end-date"
-            name="end_date"
-            class="form-control"
-            value="{{ end_date }}"
-          />
-        </div>
-        <div class="form-group">
-          <label for="bill-no">Bill No:</label>
-          <input
-            type="text"
-            name="bill_no"
-            id="bill-no"
-            class="form-control"
-            placeholder="Bill no"
-            value="{{ bill_no }}"
-          />
-        </div>
-        <div class="form-group">
-          <label for="payment-status">Payment Status:</label>
-          <select
-            name="payment_status"
-            id="payment-status"
-            class="form-control"
-          >
-            <option value="">All</option>
-            <option value="paid" {% if payment_status == "paid" %}selected{% endif %}>Paid</option>
-            <option value="unpaid" {% if payment_status == "unpaid" %}selected{% endif %}>Unpaid</option>
-            <option value="return" {% if payment_status == "return" %}selected{% endif %}>Return</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="customer-name">Customer Name:</label>
-          <input
-            type="text"
-            name="customer_name"
-            id="customer-name"
-            class="form-control"
-            placeholder="Customer Name"
-            value="{{ customer_name }}"
-          />
-        </div>
-        <button type="submit" class="btn btn-primary align-self-end">
-          Filter
-        </button>
-        <a href="{% url 'sale_list' %}" class="btn btn-danger align-self-end">
-          Clear Filter
-        </a>
-      </form>
-    </div>
 
-    <!-- Overview Box -->
-    <div class="overview-box">
-      <p class="paid">Total Paid: ₹{{ total_paid }}</p>
-      <p class="unpaid">Total Unpaid: ₹{{ total_unpaid }}</p>
-      <p class="return">Total Return: ₹{{ total_return }}</p>
-    </div>
-
-    <!-- Sales Table -->
-    <div class="table-container">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Sale ID</th>
-            <th>Date</th>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Total Price</th>
-            <th>Payment Status</th>
-            <th>Bill</th>
-            <th>Return</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for sale in grouped_sales %}
-          <tr>
-            <td>{{ sale.sale_id }}</td>
-            <td>{{ sale.datetime }}</td>
-            <td>{{ sale.customer_name }}</td>
-            <td>{{ sale.customer_mobile }}</td>
-            <td>₹{{ sale.grand_total }}</td>
-            <td>
-              <form
-                method="POST"
-                action="{% url 'toggle_payment_status' sale_id=sale.sale_id %}"
-              >
-                {% csrf_token %}
-                <button
-                  type="submit"
-                  class="btn-status {% if sale.payment_status == 'unpaid' %}unpaid {% elif sale.payment_status == 'paid' %}paid {% elif sale.payment_status == 'return' %}return{% endif %}"
-                >
-
-                  {% if sale.payment_status == 'unpaid' %}
-                  Unpaid
-                  {% elif sale.payment_status == 'paid' %}
-                  Paid
-                  {% elif sale.payment_status == 'return' %}
-                  Return
-                  {% endif %}
-
+        <!-- Filter Section -->
+        <div class="filter-container">
+            <form method="get" class="d-flex">
+                <div class="form-group">
+                    <label for="start-date">Start Date:</label>
+                    <input
+                        type="date"
+                        id="start-date"
+                        name="start_date"
+                        class="form-control"
+                        value="{{ start_date }}"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="end-date">End Date:</label>
+                    <input
+                        type="date"
+                        id="end-date"
+                        name="end_date"
+                        class="form-control"
+                        value="{{ end_date }}"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="bill-no">Bill No:</label>
+                    <input
+                        type="text"
+                        name="bill_no"
+                        id="bill-no"
+                        class="form-control"
+                        placeholder="Bill no"
+                        value="{{ bill_no }}"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="payment-status">Payment Status:</label>
+                    <select
+                        name="payment_status"
+                        id="payment-status"
+                        class="form-control"
+                    >
+                        <option value="">All</option>
+                        <option value="paid" {% if payment_status == "paid" %}selected{% endif %}>Paid</option>
+                        <option value="unpaid" {% if payment_status == "unpaid" %}selected{% endif %}>Unpaid</option>
+                        <option value="return" {% if payment_status == "return" %}selected{% endif %}>Return</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="customer-name">Customer Name:</label>
+                    <input
+                        type="text"
+                        name="customer_name"
+                        id="customer-name"
+                        class="form-control"
+                        placeholder="Customer Name"
+                        value="{{ customer_name }}"
+                    />
+                </div>
+                <button type="submit" class="btn btn-primary align-self-end">
+                    Filter
                 </button>
-              </form>
-            </td>
-            <td>
-              {% if sale.pdf_exists %}
-              <a
-                href="{% url 'serve_pdf' sale_id=sale.sale_id %}"
-                target="_blank"
-                class="btn btn-info"
-              >View Bill</a
-                        >
-              {% else %}
-              <span>No Bill</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if sale.is_within_7_days %}
-              <a
-                href="{% url 'return_items' sale.sale_id %}"
-                class="btn btn-warning"
-              >Return Items</a
-                           >
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <div class="pagination-container">
-      <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-          {% if page_obj.has_previous %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if customer_name %}&customer_name={{ customer_name }}{% endif %}{% if bill_no %}&bill_no={{ bill_no }}{% endif %}">
-              Previous
-            </a>
-          </li>
-          {% endif %}
+                <a href="{% url 'sale_list' %}" class="btn btn-danger align-self-end">
+                    Clear Filter
+                </a>
+            </form>
+        </div>
 
-          {% for num in page_obj.paginator.page_range %}
-          <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-            <a class="page-link" href="?page={{ num }}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if customer_name %}&customer_name={{ customer_name }}{% endif %}{% if bill_no %}&bill_no={{ bill_no }}{% endif %}">
-              {{ num }}
-            </a>
-          </li>
-          {% endfor %}
+        <!-- Overview Box -->
+        <div class="overview-box">
+            <p class="paid">Total Paid: ₹{{ total_paid }}</p>
+            <p class="unpaid">Total Unpaid: ₹{{ total_unpaid }}</p>
+            <p class="return">Total Return: ₹{{ total_return }}</p>
+        </div>
 
-          {% if page_obj.has_next %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if customer_name %}&customer_name={{ customer_name }}{% endif %}{% if bill_no %}&bill_no={{ bill_no }}{% endif %}">
-              Next
-            </a>
-          </li>
-          {% endif %}
-        </ul>
-      </nav>
-    </div>
-  </body>
+        <!-- Sales Table -->
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Sale ID</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Mobile</th>
+                        <th>Total Price</th>
+                        <th>Payment Status</th>
+                        <th>Bill</th>
+                        <th>Return</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in grouped_sales %}
+                        <tr>
+                            <td>{{ sale.sale_id }}</td>
+                            <td>{{ sale.datetime }}</td>
+                            <td>{{ sale.customer_name }}</td>
+                            <td>{{ sale.customer_mobile }}</td>
+                            <td>₹{{ sale.grand_total }}</td>
+                            <td>
+                                <form
+                                    method="POST"
+                                    action="{% url 'toggle_payment_status' sale_id=sale.sale_id %}"
+                                >
+                                    {% csrf_token %}
+                                    <button
+                                        type="submit"
+                                        class="btn-status {% if sale.payment_status == 'unpaid' %}unpaid {% elif sale.payment_status == 'paid' %}paid {% elif sale.payment_status == 'return' %}return{% endif %}"
+                                    >
+
+                                        {% if sale.payment_status == 'unpaid' %}
+                                            Unpaid
+                                        {% elif sale.payment_status == 'paid' %}
+                                            Paid
+                                        {% elif sale.payment_status == 'return' %}
+                                            Return
+                                        {% endif %}
+
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                {% if sale.pdf_exists %}
+                                    <a
+                                        href="{% url 'serve_pdf' sale_id=sale.sale_id %}"
+                                        target="_blank"
+                                        class="btn btn-info"
+                                    >View Bill</a
+                                              >
+                                {% else %}
+                                    <span>No Bill</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if sale.is_within_7_days %}
+                                    <a
+                                        href="{% url 'return_items' sale.sale_id %}"
+                                        class="btn btn-warning"
+                                    >Return Items</a
+                                                 >
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination-container">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if customer_name %}&customer_name={{ customer_name }}{% endif %}{% if bill_no %}&bill_no={{ bill_no }}{% endif %}">
+                                Previous
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if customer_name %}&customer_name={{ customer_name }}{% endif %}{% if bill_no %}&bill_no={{ bill_no }}{% endif %}">
+                                {{ num }}
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if customer_name %}&customer_name={{ customer_name }}{% endif %}{% if bill_no %}&bill_no={{ bill_no }}{% endif %}">
+                                Next
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </body>
 </html>

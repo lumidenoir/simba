@@ -11,7 +11,7 @@ htmlcov
 db.sqlite3
 .env
 *.pot
-static/
+staticfiles/
 bill/
 
 venv/
